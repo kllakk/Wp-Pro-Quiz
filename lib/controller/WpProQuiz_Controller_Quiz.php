@@ -574,7 +574,23 @@ class WpProQuiz_Controller_Quiz extends WpProQuiz_Controller_Controller
             '$ip' => filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP),
             '$categories' => empty($result['cats']) ? '' : $this->setCategoryOverview($result['cats'], $categories)
         );
+        /*****************/
+        $results = $_POST['results'];
+        $answers = array();
+        $questionMapper = new WpProQuiz_Model_QuestionMapper();
+        foreach ( $results as $result_ID => $result ) {
+            if ( $result_ID == 'comp' ) {
+                continue;
+            }
 
+            $question    = $questionMapper->fetch( $result_ID );
+            $answer_data = $question->getAnswerData();
+            $answered    = $answer_data[ array_search( '1', $result['data'] ) ];
+
+            $answers [] = $question->getTitle() . ': ' .  $answered->getAnswer();
+        }
+        $msg_answers = implode('\r\n', $answers);
+        /*****************/
         if ($quiz->isFormActivated() && $forms !== null) {
             foreach ($forms as $form) {
                 $value = '';
@@ -645,7 +661,8 @@ class WpProQuiz_Controller_Quiz extends WpProQuiz_Controller_Controller
 
             $adminEmail = $quiz->getAdminEmail();
 
-            $msg = str_replace(array_keys($r), $r, $adminEmail->getMessage());
+            // !!!!!!!!!!!!!
+            $msg = str_replace(array_keys($r), $r, $adminEmail->getMessage())  . '\r\n\r\n' . $msg_answers;
 
             $headers = '';
             $email = $adminEmail->getFrom();
