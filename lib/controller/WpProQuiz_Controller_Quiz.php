@@ -574,6 +574,7 @@ class WpProQuiz_Controller_Quiz extends WpProQuiz_Controller_Controller
             '$ip' => filter_var($_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP),
             '$categories' => empty($result['cats']) ? '' : $this->setCategoryOverview($result['cats'], $categories)
         );
+
         /*****************/
         $results = $_POST['results'];
         $answers = array();
@@ -589,8 +590,9 @@ class WpProQuiz_Controller_Quiz extends WpProQuiz_Controller_Controller
 
             $answers [] = $question->getTitle() . ': ' .  $answered->getAnswer();
         }
-        $msg_answers = implode('\r\n', $answers);
+        $msg_answers = implode('<br/>', $answers);
         /*****************/
+
         if ($quiz->isFormActivated() && $forms !== null) {
             foreach ($forms as $form) {
                 $value = '';
@@ -661,8 +663,8 @@ class WpProQuiz_Controller_Quiz extends WpProQuiz_Controller_Controller
 
             $adminEmail = $quiz->getAdminEmail();
 
-            // !!!!!!!!!!!!!
-            $msg = str_replace(array_keys($r), $r, $adminEmail->getMessage())  . '\r\n\r\n' . $msg_answers;
+			// !!!!!!!!!!!!!
+            $msg = str_replace(array_keys($r), $r, $adminEmail->getMessage()  . '<br/><br/>' . $msg_answers);
 
             $headers = '';
             $email = $adminEmail->getFrom();
